@@ -45,7 +45,7 @@ public class Main {
         System.out.println("Заливка: " + rectangle.fillColor);
         System.out.println("Границы: " + rectangle.borderColor);
 
-        Triangle triangle = new Triangle(6, 4, 5, 5, "Зелный", "Черный");
+        Triangle triangle = new Triangle(6, 4, 5, 5, "Зеленый", "Черный");
 
         System.out.println("Треугольник:");
         triangle.printInfo();

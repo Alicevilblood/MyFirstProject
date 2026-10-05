@@ -16,7 +16,6 @@ public class MtsTestJUnit {
     void setUp() {
         driver = new ChromeDriver();
         driver.get("https://www.mts.by/");
-        driver.findElement(By.id("cookie-agree")).click();
     }
 
     @AfterEach

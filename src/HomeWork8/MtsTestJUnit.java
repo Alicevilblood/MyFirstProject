@@ -11,12 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MtsTestJUnit {
     private WebDriver driver;
+    MtsPage mtsPage;
 
     @BeforeEach
     void setUp() {
         driver = new ChromeDriver();
+        mtsPage = new MtsPage(driver);
         driver.get("https://www.mts.by/");
-        driver.findElement(By.id("cookie-agree")).click();
     }
 
     @AfterEach
@@ -26,39 +27,32 @@ public class MtsTestJUnit {
 
     @Test
     void checkOnlinePaymentBlock() {
-        assertTrue(driver.findElement(By.xpath("//h2[contains(., 'Онлайн пополнение')]"))
-                .isDisplayed());
+        assertTrue(mtsPage.isOnlinePaymentTitleDisplayed());
     }
 
     @Test
     void checkPaymantLogo() {
-        assertTrue(driver.findElement(By.cssSelector("img[alt='Visa']"))
-                .isDisplayed());
+        assertTrue(mtsPage.isVisaLogoDisplayed());
     }
 
     @Test
     void checkMastercardLogo() {
-        assertTrue(driver.findElement(By.cssSelector("img[alt='MasterCard Secure Code']"))
-                .isDisplayed());
+        assertTrue(mtsPage.isMastercardLogoDisplayed());
     }
 
     @Test
     void checkMoreDetailsLink() {
-        assertTrue(driver.findElement(By.linkText("Подробнее о сервисе"))
-                .isDisplayed());
+        assertTrue(mtsPage.isMoreDetailsLinkDisplayed());
     }
 
     @Test
     void checkContinueButton() throws InterruptedException {
-        driver.findElement(By.id("connection-phone"))
-                .sendKeys("297777777");
-        driver.findElement(By.id("connection-sum"))
-                .sendKeys("10");
+        mtsPage.enterPhone("297777777");
+        mtsPage.enterAmount("10");
 
         Thread.sleep(500);
 
-        assertTrue(driver.findElement(By.cssSelector("#pay-connection button[type='submit']"))
-                .isDisplayed());
+        assertTrue(mtsPage.isContinueButtonDisplayed());
     }
 }
 

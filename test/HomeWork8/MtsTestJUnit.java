@@ -1,17 +1,26 @@
 package HomeWork8;
 
+import io.qameta.allure.Allure;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Epic("mts.by")
+@Feature("Онлайн пополнение без комиссии")
 public class MtsTestJUnit {
     private WebDriver driver;
     private MtsPage mtsPage;
@@ -27,15 +36,19 @@ public class MtsTestJUnit {
 
     @AfterEach
     void tearDown() {
+        Allure.addAttachment("Скриншот", "image/png",
+                new ByteArrayInputStream(((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES)), "png");
         driver.quit();
     }
 
     @Test
+    @DisplayName("Название блока «Онлайн пополнение без комиссии»")
     void checkBlockTitle() {
         assertEquals("Онлайн пополнение без комиссии", mtsPage.getBlockTitle());
     }
 
     @Test
+    @DisplayName("Логотипы платёжных систем")
     void checkPaymentLogos() {
         List<WebElement> logos = mtsPage.getPartnerLogos();
         assertEquals(5, logos.size(), "Должно быть 5 логотипов");
@@ -45,6 +58,7 @@ public class MtsTestJUnit {
     }
 
     @Test
+    @DisplayName("Ссылка «Подробнее о сервисе»")
     void checkMoreDetailsLink() {
         mtsPage.clickMoreDetailsLink();
         assertTrue(mtsPage.isUrlContains("/help/poryadok-oplaty-i-bezopasnost-internet-platezhey/"),
@@ -52,6 +66,7 @@ public class MtsTestJUnit {
     }
 
     @Test
+    @DisplayName("Кнопка «Продолжить» открывает окно оплаты")
     void checkContinueButton() {
         mtsPage.enterPhone("297777777");
         mtsPage.enterAmount("10");
@@ -60,6 +75,7 @@ public class MtsTestJUnit {
     }
 
     @Test
+    @DisplayName("Надписи в полях: Услуги связи")
     void checkConnectionPlaceholders() {
         mtsPage.selectPaymentType("Услуги связи");
         assertEquals("Номер телефона", mtsPage.getPlaceholder("connection-phone"));
@@ -68,6 +84,7 @@ public class MtsTestJUnit {
     }
 
     @Test
+    @DisplayName("Надписи в полях: Домашний интернет")
     void checkInternetPlaceholders() {
         mtsPage.selectPaymentType("Домашний интернет");
         assertEquals("Номер абонента", mtsPage.getPlaceholder("internet-phone"));
@@ -76,6 +93,7 @@ public class MtsTestJUnit {
     }
 
     @Test
+    @DisplayName("Надписи в полях: Рассрочка")
     void checkInstalmentPlaceholders() {
         mtsPage.selectPaymentType("Рассрочка");
         assertEquals("Номер счета на 44", mtsPage.getPlaceholder("score-instalment"));
@@ -84,6 +102,7 @@ public class MtsTestJUnit {
     }
 
     @Test
+    @DisplayName("Надписи в полях: Задолженность")
     void checkArrearsPlaceholders() {
         mtsPage.selectPaymentType("Задолженность");
         assertEquals("Номер счета на 2073", mtsPage.getPlaceholder("score-arrears"));
@@ -92,6 +111,7 @@ public class MtsTestJUnit {
     }
 
     @Test
+    @DisplayName("Окно оплаты услуг связи: сумма, номер, поля карты, иконки")
     void checkRefillFlowForCommunicationServices() {
         mtsPage.enterPhone("297777777");
         mtsPage.enterAmount("10");

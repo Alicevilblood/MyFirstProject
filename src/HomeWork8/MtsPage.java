@@ -1,28 +1,93 @@
 package HomeWork8;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.List;
 
 public class MtsPage {
-    private WebDriver driver;
+    private final WebDriver driver;
+
+    private final By cookieButton = By.id("cookie-agree");
+    private final By blockTitle = By.cssSelector(".pay__wrapper h2");
+    private final By partnerLogos = By.cssSelector(".pay__partners img");
+    private final By moreDetailsLink = By.linkText("Подробнее о сервисе");
+    private final By paymentTypeSelect = By.cssSelector(".pay__form .select__header");
+    private final By phoneInput = By.id("connection-phone");
+    private final By amountInput = By.id("connection-sum");
+    private final By continueButton = By.cssSelector("#pay-connection button[type='submit']");
+
+    private final By paymentFrame = By.cssSelector("iframe.payment-widget-iframe");
+    private final By frameAmount = By.cssSelector(".pay-description__cost");
+    private final By frameDescription = By.cssSelector(".pay-description__text");
+    private final By framePayButton = By.cssSelector("button[type='submit']");
+    private final By cardNumberLabel = By.xpath("//input[@id='cc-number']/following-sibling::label");
+    private final By expiryLabel = By.xpath("//input[@formcontrolname='expirationDate']/following-sibling::label");
+    private final By cvcLabel = By.xpath("//input[@formcontrolname='cvc']/following-sibling::label");
+    private final By holderLabel = By.xpath("//input[@formcontrolname='holder']/following-sibling::label");
+    private final By cardIcons = By.cssSelector(".cards-brands__container > img");
 
     public MtsPage(WebDriver driver) {
         this.driver = driver;
     }
 
-    private By cookieButton = By.id("cookie-agree");
-
-    public void acceptCookies() {
-        driver.findElement(cookieButton).click();
+    private WebDriverWait waitFor(int seconds) {
+        return new WebDriverWait(driver, Duration.ofSeconds(seconds));
     }
 
-    private By phoneInput = By.id("connection-phone");
+    public void acceptCookiesIfPresent() {
+        try {
+            waitFor(5).until(ExpectedConditions.elementToBeClickable(cookieButton)).click();
+        } catch (TimeoutException ignored) {
+        }
+    }
+
+    public String getBlockTitle() {
+        return driver.findElement(blockTitle).getAttribute("textContent").replaceAll("\\s+", " ").trim();
+    }
+
+    public List<WebElement> getPartnerLogos() {
+        return driver.findElements(partnerLogos);
+    }
+
+    public void clickMoreDetailsLink() {
+        driver.findElement(moreDetailsLink).click();
+    }
+
+    public boolean isUrlContains(String part) {
+        try {
+            return waitFor(10).until(ExpectedConditions.urlContains(part));
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
+
+    public void selectPaymentType(String name) {
+        By option = By.xpath("//p[@class='select__option' and text()='" + name + "']");
+        driver.findElement(paymentTypeSelect).click();
+        waitFor(5).ignoring(ElementClickInterceptedException.class).until(d -> {
+            d.findElement(option).click();
+            return true;
+        });
+    }
+
+    public String getPlaceholder(String fieldId) {
+        return waitFor(5).until(ExpectedConditions.visibilityOfElementLocated(By.id(fieldId)))
+                .getAttribute("placeholder");
+    }
 
     public void enterPhone(String phone) {
         driver.findElement(phoneInput).sendKeys(phone);
+    }
+
+    public void enterAmount(String amount) {
+        driver.findElement(amountInput).sendKeys(amount);
     }
 
     public String getPhoneValue() {
@@ -33,166 +98,52 @@ public class MtsPage {
         return driver.findElement(amountInput).getAttribute("value");
     }
 
-    public String getPhonePlaceholder() {
-        return driver.findElement(phoneInput).getAttribute("placeholder");
-    }
-
-    private By internetAmountInput = By.id("internet-sum");
-
-    public String getInternetAmountPlaceholder() {
-        return driver.findElement(internetAmountInput).getAttribute("placeholder");
-    }
-
-    private By internetEmailInput = By.id("internet-email");
-
-    public String getInternetEmailPlaceholder() {
-        return driver.findElement(internetEmailInput).getAttribute("placeholder");
-    }
-
-    private By instalmentAccountInput = By.id("score-instalment");
-
-    public String getInstalmentAccountPlaceholder() {
-        return driver.findElement(instalmentAccountInput).getAttribute("placeholder");
-    }
-
-    private By instalmentAmountInput = By.id("instalment-sum");
-
-    public String getInstalmentAmountPlaceholder() {
-        return driver.findElement(instalmentAmountInput).getAttribute("placeholder");
-    }
-
-    private By instalmentEmailInput = By.id("instalment-email");
-
-    public String getInstalmentEmailPlaceholder() {
-        return driver.findElement(instalmentEmailInput).getAttribute("placeholder");
-    }
-
-    private By arrearsAccountInput = By.id("score-arrears");
-
-    public String getArrearsAccountPlaceholder() {
-        return driver.findElement(arrearsAccountInput).getAttribute("placeholder");
-    }
-
-    private By arrearsAmountInput = By.id("arrears-sum");
-
-    public String getArrearsAmountPlaceholder() {
-        return driver.findElement(arrearsAmountInput).getAttribute("placeholder");
-    }
-
-    private By arrearsEmailInput = By.id("arrears-email");
-
-    public String getArrearsEmailPlaceholder() {
-        return driver.findElement(arrearsEmailInput).getAttribute("placeholder");
-    }
-
-    private By internetPhoneInput = By.id("internet-phone");
-
-    public String getInternetPhonePlaceholder() {
-        return driver.findElement(internetPhoneInput).getAttribute("placeholder");
-    }
-
-    private By amountInput = By.id("connection-sum");
-
-    public void enterAmount(String amount) {
-        driver.findElement(amountInput).sendKeys(amount);
-    }
-
-    public String getAmountPlaceholder() {
-        return driver.findElement(amountInput).getAttribute("placeholder");
-    }
-
-    private By emailInput = By.id("connection-email");
-
-    public String getEmailPlaceholder() {
-        return driver.findElement(emailInput).getAttribute("placeholder");
-    }
-
-    private By continueButton = By.cssSelector("#pay-connection button[type='submit']");
-
     public void clickContinue() {
         driver.findElement(continueButton).click();
     }
 
-    public void waitForPaymentForm() {
-        new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(driver -> driver.findElement(By.id("cc-number")).isDisplayed());
+    public boolean isPaymentFrameDisplayed() {
+        try {
+            return waitFor(15).until(ExpectedConditions.visibilityOfElementLocated(paymentFrame)).isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
-    public String getModalContinueButtonText() {
-        return driver.findElement(
-                By.cssSelector("button[type='submit'] span")
-        ).getText();
+    public void switchToPaymentFrame() {
+        waitFor(15).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(paymentFrame));
+        waitFor(15).until(ExpectedConditions.visibilityOfElementLocated(frameAmount));
     }
 
-    public String getModalPhone() {
-        return driver.findElement(
-                By.xpath("//*[contains(text(),'29 777-77-77')]")
-        ).getText();
+    public String getFrameAmount() {
+        return driver.findElement(frameAmount).getText();
     }
 
-    public String getModalAmount() {
-        return driver.findElement(
-                By.xpath("//*[contains(text(),'10.00 BYN')]")
-        ).getText();
+    public String getFrameDescription() {
+        return driver.findElement(frameDescription).getText();
     }
 
-    public String getCardExpiryPlaceholder() {
-        return driver.findElement(
-                By.cssSelector("input[formcontrolname='expirationDate']")
-        ).getAttribute("placeholder");
+    public String getPayButtonText() {
+        return driver.findElement(framePayButton).getText();
     }
 
-    public String getCardCvvPlaceholder() {
-        return driver.findElement(
-                        By.cssSelector("input[formcontrolname='cvc']")
-                ).findElement(By.xpath("./following-sibling::label"))
-                .getText();
+    public String getCardNumberLabel() {
+        return driver.findElement(cardNumberLabel).getText();
     }
 
-    public String getCardNumberPlaceholder() {
-        return driver.findElement(By.id("cc-number"))
-                .findElement(By.xpath("./following-sibling::label"))
-                .getText();
+    public String getExpiryLabel() {
+        return driver.findElement(expiryLabel).getText();
     }
 
-    public boolean arePaymentIconsVisible() {
-        return driver.findElements(
-                By.cssSelector("img[src*='payment-icons/card-types']")
-        ).stream().allMatch(element -> element.isDisplayed());
+    public String getCvcLabel() {
+        return driver.findElement(cvcLabel).getText();
     }
 
-    public boolean isContinueButtonDisplayed() {
-        return driver.findElement(continueButton).isDisplayed();
+    public String getHolderLabel() {
+        return driver.findElement(holderLabel).getText();
     }
 
-    public boolean isContinueButtonEnabled() {
-        return driver.findElement(continueButton).isEnabled();
-    }
-
-    private By onlinePaymentTitle =
-            By.xpath("//h2[contains(.,'Онлайн пополнение')]");
-
-    public boolean isOnlinePaymentTitleDisplayed() {
-        return driver.findElement(onlinePaymentTitle).isDisplayed();
-    }
-
-    private By visaLogo = By.cssSelector("img[alt='Visa']");
-
-    public boolean isVisaLogoDisplayed() {
-        return driver.findElement(visaLogo).isDisplayed();
-    }
-
-    private By mastercardLogo =
-            By.cssSelector("img[alt='MasterCard Secure Code']");
-
-    public boolean isMastercardLogoDisplayed() {
-        return driver.findElement(mastercardLogo).isDisplayed();
-    }
-
-    private By moreDetailsLink =
-            By.linkText("Подробнее о сервисе");
-
-    public boolean isMoreDetailsLinkDisplayed() {
-        return driver.findElement(moreDetailsLink).isDisplayed();
+    public List<WebElement> getCardIcons() {
+        return driver.findElements(cardIcons);
     }
 }

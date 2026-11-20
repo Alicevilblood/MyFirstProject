@@ -15,6 +15,7 @@
         <junit.version>5.14.3</junit.version>
         <allure.version>2.35.5</allure.version>
         <aspectj.version>1.9.25</aspectj.version>
+        <testng.version>7.11.0</testng.version>
     </properties>
 
     <dependencyManagement>
@@ -50,6 +51,12 @@
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-junit5</artifactId>
             <version>${allure.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
